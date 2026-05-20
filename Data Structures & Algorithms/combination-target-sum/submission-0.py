@@ -1,30 +1,35 @@
 class Solution:
     def combinationSum(self, nums: List[int], target: int) -> List[List[int]]:
-        output = []
-        
-        def backtrack(i, remaining, path):
-            # success: hit target exactly
-            if remaining == 0:
-                output.append(path[:])      # append a *copy* — path keeps mutating
+        output= [] 
+
+        # i: index at nums[i]
+        # remaining: how much left to reach 
+        # path: list of what we have built so far at the leaf node
+        def dfs(i, remaining, path): 
+            # successful base case
+            if remaining == 0: 
+                output.append(path.copy())
                 return
-            
-            # failure: ran out of numbers to consider
-            if i == len(nums):
-                return
-            
-            # try every valid number of copies of nums[i]
-            max_copies = remaining // nums[i]
-            for copies in range(0, max_copies + 1):
-                # add `copies` of nums[i] to path
-                for _ in range(copies):
-                    path.append(nums[i])
-                
-                # recurse to next index with updated remaining
-                backtrack(i + 1, remaining - copies * nums[i], path)
-                
-                # undo: remove the `copies` we just added
-                for _ in range(copies):
+            # failed base case 
+            if remaining < 0 or i == len(nums): 
+                return 
+
+            # KEY: 
+            #   Upper bound: how many copies of num[i] fit in remaining
+            #   Lower bound: start as 0, can skip this element 
+            for copies in range(0, (remaining // nums[i]) + 1): 
+                path.extend([nums[i]] * copies) 
+                # move to the next element in original nums list
+                dfs(i+1, remaining - copies * nums[i], path)
+
+                # backtracking step, remove one by one
+                for _ in range(copies): 
                     path.pop()
-        
-        backtrack(0, target, [])
+                
+        dfs(0, target, []) 
         return output
+                
+            
+        
+
+         
